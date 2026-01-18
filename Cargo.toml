@@ -8,3 +8,4 @@ toml = "0.8"                                      # TOML files parse karne ke li
 serde = { version = "1.0", features = ["derive"] } # Serialization/Deserialization
 anyhow = "1.0"                                     # Better error handling
 clap = { version = "4.0", features = ["derive"] }  # Command line arguments
+colored = "2.1" 
