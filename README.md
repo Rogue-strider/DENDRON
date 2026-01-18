@@ -25,7 +25,7 @@ dendron
 ## Development
 
 \`\`\`bash
-git clone https://github.com/yourusername/dendron
+git clone https://github.com/Rogue-strider/DENDRON
 cd dendron
 cargo build
 cargo run
