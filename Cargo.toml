@@ -1,0 +1,10 @@
+[package]
+name = "DENDRON"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+toml = "0.8"                                      # TOML files parse karne ke liye
+serde = { version = "1.0", features = ["derive"] } # Serialization/Deserialization
+anyhow = "1.0"                                     # Better error handling
+clap = { version = "4.0", features = ["derive"] }  # Command line arguments
