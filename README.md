@@ -31,6 +31,4 @@ cargo build
 cargo run
 \`\`\`
 
-## License
 
-MIT
