@@ -1,7 +1,8 @@
 use crate::parser::{CargoManifest, CargoParser, MetadataParser, PackageInfo};
 use super::node::DependencyNode;
-use std::collections::HashMap;
-use colored::*;  // <-- Yeh import add karo
+use std::collections::{HashMap, HashSet};
+use std::path::Path;
+use colored::*;
 
 pub struct DependencyGraph {
     pub root: DependencyNode,
