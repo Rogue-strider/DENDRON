@@ -4,7 +4,6 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
-// Cargo.toml ka structure
 #[derive(Debug, Deserialize)]
 pub struct CargoManifest {
     pub package: Package,
@@ -18,7 +17,6 @@ pub struct Package {
     pub version: String,
 }
 
-// Dependency do tarah ki ho sakti hai
 #[derive(Debug, Deserialize, Clone)]
 #[serde(untagged)]
 pub enum Dependency {
