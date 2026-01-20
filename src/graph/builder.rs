@@ -10,7 +10,6 @@ pub struct DependencyGraph {
 }
 
 impl DependencyGraph {
-    // Build graph from Cargo.toml (direct dependencies only)
     pub fn from_manifest(manifest: &CargoManifest) -> Self {
         let root_name = manifest.package.name.clone();
         let root_version = manifest.package.version.clone();
@@ -33,7 +32,7 @@ impl DependencyGraph {
         Self { root, nodes }
     }
 
-    // Build graph from cargo metadata (includes nested dependencies)
+    
     pub fn from_metadata<P: AsRef<Path>>(manifest_path: P) -> anyhow::Result<Self> {
         let packages = MetadataParser::parse(&manifest_path)?;
         let root_name = MetadataParser::get_root_package_name(&manifest_path)?;
@@ -50,7 +49,7 @@ impl DependencyGraph {
         let mut nodes = HashMap::new();
         let mut visited = HashSet::new();
 
-        // Build the tree recursively
+       
         for dep_name in &root_package.dependencies {
             root.add_dependency(dep_name.clone());
             Self::build_tree_recursive(
@@ -72,7 +71,6 @@ impl DependencyGraph {
         nodes: &mut HashMap<String, DependencyNode>,
         visited: &mut HashSet<String>,
     ) {
-        // Prevent infinite recursion in case of circular dependencies
         if visited.contains(package_name) {
             return;
         }
@@ -86,11 +84,9 @@ impl DependencyGraph {
             )
             .with_depth(depth);
 
-            // Add this package's dependencies
             for dep_name in &package.dependencies {
                 node.add_dependency(dep_name.clone());
                 
-                // Recursively build children
                 Self::build_tree_recursive(
                     dep_name,
                     depth + 1,
@@ -104,7 +100,6 @@ impl DependencyGraph {
         }
     }
 
-    // Print full dependency tree
     pub fn print_tree(&self) {
         println!("{}", "🌳 Dependency Tree:".bright_cyan().bold());
         println!();
@@ -116,7 +111,6 @@ impl DependencyGraph {
         let extension = if is_last { "    " } else { "│   " };
 
         if node.depth == 0 {
-            // Root node
             println!(
                 "{} {} {}",
                 "📦".bright_yellow(),
@@ -124,7 +118,6 @@ impl DependencyGraph {
                 format!("({})", node.version).bright_black()
             );
         } else {
-            // Child dependencies - Different colors based on depth
             let name_colored = match node.depth {
                 1 => node.name.bright_blue(),
                 2 => node.name.bright_magenta(),
@@ -162,7 +155,6 @@ impl DependencyGraph {
         }
     }
 
-    // Print only direct dependencies
     pub fn print_tree_direct_only(&self) {
         println!("{}", "🌳 Dependency Tree (Direct Only):".bright_cyan().bold());
         println!();
@@ -190,7 +182,6 @@ impl DependencyGraph {
         }
     }
 
-    // Print tree with max depth limit
     pub fn print_tree_with_depth(&self, max_depth: usize) {
         println!(
             "{}",
@@ -228,7 +219,6 @@ impl DependencyGraph {
             );
         }
 
-        // Don't print children if we've reached max depth
         if node.depth >= max_depth {
             return;
         }
@@ -254,7 +244,6 @@ impl DependencyGraph {
         }
     }
 
-    // Print summary
     pub fn print_summary(&self) {
         println!("{}", "📋 Dependency Summary:".bright_cyan().bold());
         println!();
@@ -267,7 +256,6 @@ impl DependencyGraph {
         );
         println!();
         
-        // Group by depth
         let mut by_depth: HashMap<usize, Vec<&DependencyNode>> = HashMap::new();
         
         for node in self.nodes.values() {
