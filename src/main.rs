@@ -37,7 +37,11 @@ struct Args {
 
     /// Show summary instead of full tree
     #[arg(short, long)]
-    summary: bool,  // <-- NEW ARGUMENT
+    summary: bool,
+
+    /// Output format: json, json-compact, dot
+    #[arg(short, long, value_name = "FORMAT")]
+    output: Option<String>,  // <-- NEW
 }
 
 fn print_banner() {
@@ -62,7 +66,10 @@ fn main() -> Result<()> {
         colored::control::set_override(false);
     }
 
-    print_banner();
+    // If output format is specified, skip banner for clean output
+    if args.output.is_none() {
+        print_banner();
+    }
     
     let cargo_path = if let Some(path) = args.path {
         if path.is_dir() {
@@ -74,18 +81,20 @@ fn main() -> Result<()> {
         PathBuf::from("Cargo.toml")
     };
 
-    println!(
-        "{} Analyzing: {}",
-        "🔍".bright_yellow(),
-        cargo_path.display().to_string().bright_white()
-    );
+    if args.output.is_none() {
+        println!(
+            "{} Analyzing: {}",
+            "🔍".bright_yellow(),
+            cargo_path.display().to_string().bright_white()
+        );
 
-    if args.nested {
-        println!("{} Mode: Nested dependencies (transitive)", "📊".bright_cyan());
-    } else {
-        println!("{} Mode: Direct dependencies only", "📊".bright_cyan());
+        if args.nested {
+            println!("{} Mode: Nested dependencies (transitive)", "📊".bright_cyan());
+        } else {
+            println!("{} Mode: Direct dependencies only", "📊".bright_cyan());
+        }
+        println!();
     }
-    println!();
     
     // Build graph based on mode
     let graph = if args.nested {
@@ -95,22 +104,41 @@ fn main() -> Result<()> {
         DependencyGraph::from_manifest(&manifest)
     };
     
-    // Print tree based on options (UPDATED LOGIC)
+    // Handle output format
+    if let Some(format) = args.output {
+        match format.to_lowercase().as_str() {
+            "json" => {
+                let json = graph.to_json()?;
+                println!("{}", json);
+            }
+            "json-compact" => {
+                let json = graph.to_json_compact()?;
+                println!("{}", json);
+            }
+            "dot" => {
+                let dot = graph.to_dot();
+                println!("{}", dot);
+            }
+            _ => {
+                eprintln!("❌ Unknown output format: {}", format);
+                eprintln!("Available formats: json, json-compact, dot");
+                std::process::exit(1);
+            }
+        }
+        return Ok(());
+    }
+    
+    // Normal output - Print tree based on options
     if args.summary {
-        // Summary view
         graph.print_summary();
     } else if args.direct_only {
-        // Direct dependencies only
         graph.print_tree_direct_only();
     } else if let Some(max_depth) = args.depth {
-        // Tree with depth limit
         graph.print_tree_with_depth(max_depth);
     } else {
-        // Full tree
         graph.print_tree();
     }
     
-    // Print statistics
     let stats = graph.stats();
     stats.print();
     

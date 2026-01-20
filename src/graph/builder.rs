@@ -10,51 +10,6 @@ pub struct DependencyGraph {
 }
 
 impl DependencyGraph {
-    pub fn print_summary(&self) {
-        println!("{}", "📋 Dependency Summary:".bright_cyan().bold());
-        println!();
-        
-        println!(
-            "{} {} {}",
-            "📦".bright_yellow(),
-            self.root.name.bright_green().bold(),
-            format!("({})", self.root.version).bright_black()
-        );
-        println!();
-        
-        // Group by depth
-        let mut by_depth: std::collections::HashMap<usize, Vec<&DependencyNode>> = std::collections::HashMap::new();
-        
-        for node in self.nodes.values() {
-            by_depth.entry(node.depth).or_insert_with(Vec::new).push(node);
-        }
-        
-        for depth in 1..=3 {
-            if let Some(nodes) = by_depth.get(&depth) {
-                println!(
-                    "{} {} {}",
-                    "└─".bright_black(),
-                    format!("Level {}: {} packages", depth, nodes.len()).bright_blue().bold(),
-                    format!("(showing first 10)").bright_black()
-                );
-                
-                for (i, node) in nodes.iter().take(10).enumerate() {
-                    let connector = if i == 9 || i == nodes.len() - 1 { "   └─" } else { "   ├─" };
-                    println!(
-                        "   {} {} {}",
-                        connector.bright_black(),
-                        node.name.white(),
-                        format!("({})", node.version).bright_black()
-                    );
-                }
-                
-                if nodes.len() > 10 {
-                    println!("   {} {} more packages...", "   └─".bright_black(), (nodes.len() - 10).to_string().bright_yellow());
-                }
-                println!();
-            }
-        }
-    }
     // Build graph from Cargo.toml (direct dependencies only)
     pub fn from_manifest(manifest: &CargoManifest) -> Self {
         let root_name = manifest.package.name.clone();
@@ -295,6 +250,53 @@ impl DependencyGraph {
                     dep_name.red(),
                     "(?)".bright_black()
                 );
+            }
+        }
+    }
+
+    // Print summary
+    pub fn print_summary(&self) {
+        println!("{}", "📋 Dependency Summary:".bright_cyan().bold());
+        println!();
+        
+        println!(
+            "{} {} {}",
+            "📦".bright_yellow(),
+            self.root.name.bright_green().bold(),
+            format!("({})", self.root.version).bright_black()
+        );
+        println!();
+        
+        // Group by depth
+        let mut by_depth: HashMap<usize, Vec<&DependencyNode>> = HashMap::new();
+        
+        for node in self.nodes.values() {
+            by_depth.entry(node.depth).or_insert_with(Vec::new).push(node);
+        }
+        
+        for depth in 1..=3 {
+            if let Some(nodes) = by_depth.get(&depth) {
+                println!(
+                    "{} {} {}",
+                    "└─".bright_black(),
+                    format!("Level {}: {} packages", depth, nodes.len()).bright_blue().bold(),
+                    format!("(showing first 10)").bright_black()
+                );
+                
+                for (i, node) in nodes.iter().take(10).enumerate() {
+                    let connector = if i == 9 || i == nodes.len() - 1 { "   └─" } else { "   ├─" };
+                    println!(
+                        "   {} {} {}",
+                        connector.bright_black(),
+                        node.name.white(),
+                        format!("({})", node.version).bright_black()
+                    );
+                }
+                
+                if nodes.len() > 10 {
+                    println!("   {} {} more packages...", "   └─".bright_black(), (nodes.len() - 10).to_string().bright_yellow());
+                }
+                println!();
             }
         }
     }

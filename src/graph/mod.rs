@@ -1,5 +1,5 @@
 pub mod builder;
 pub mod node;
-
-pub use builder::DependencyGraph;
+pub mod export;
+pub use builder::{DependencyGraph, GraphStats}; 
 pub use node::DependencyNode;
