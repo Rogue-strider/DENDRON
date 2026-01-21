@@ -304,8 +304,9 @@ Contributions are welcome! Here's how you can help:
 
 ## 📞 Contact
 
-**Author**: Rogue-strider  
+**Author**: Rogue-strider 
 **Repository**: [github.com/Rogue-strider/DENDRON](https://github.com/Rogue-strider/DENDRON)
+**mail**: satyamjha91064@gmail.com
 
 ---
 
