@@ -5,7 +5,7 @@ mod analyzer;
 use anyhow::Result;
 use parser::CargoParser;
 use graph::DependencyGraph;
-use analyzer::DuplicateAnalyzer; 
+use analyzer::{DuplicateAnalyzer, CircularAnalyzer}; 
 use colored::*;
 use clap::Parser;
 use std::path::PathBuf;
@@ -44,8 +44,13 @@ struct Args {
     #[arg(short, long, value_name = "FORMAT")]
     output: Option<String>,
 
+    /// Check for duplicate dependency versions
     #[arg(long)]
-    check_duplicates: bool,  
+    check_duplicates: bool,
+
+    /// Check for circular dependencies
+    #[arg(long)]
+    check_circular: bool,
 }
 
 
@@ -120,6 +125,21 @@ fn main() -> Result<()> {
         
         let dup_stats = DuplicateAnalyzer::get_stats(&duplicates);
         dup_stats.print();
+        
+        return Ok(());
+    }
+    if args.check_circular {
+        if !args.nested {
+            println!("{}", "⚠️  Warning: Circular detection works best with --nested flag".bright_yellow());
+            println!("   Run: dendron --nested --check-circular");
+            println!();
+        }
+
+        let cycles = CircularAnalyzer::analyze(&graph);
+        CircularAnalyzer::print_report(&cycles);
+        
+        let circular_stats = CircularAnalyzer::get_stats(&cycles);
+        circular_stats.print();
         
         return Ok(());
     }
