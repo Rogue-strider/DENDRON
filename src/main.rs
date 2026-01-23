@@ -1,14 +1,15 @@
 mod parser;
 mod graph;
+mod analyzer;
 
 use anyhow::Result;
 use parser::CargoParser;
 use graph::DependencyGraph;
+use analyzer::DuplicateAnalyzer; 
 use colored::*;
 use clap::Parser;
 use std::path::PathBuf;
 
-/// DENDRON - Dependency Graph Visualizer for Rust Projects
 #[derive(Parser, Debug)]
 #[command(name = "dendron")]
 #[command(author = "Your Name")]
@@ -41,8 +42,13 @@ struct Args {
 
     /// Output format: json, json-compact, dot
     #[arg(short, long, value_name = "FORMAT")]
-    output: Option<String>,  // <-- NEW
+    output: Option<String>,
+
+    /// Check for duplicate dependency versions
+    #[arg(long)]
+    check_duplicates: bool,  // <-- NEW
 }
+
 
 fn print_banner() {
     let banner = r#"
@@ -67,7 +73,7 @@ fn main() -> Result<()> {
     }
 
     // If output format is specified, skip banner for clean output
-    if args.output.is_none() {
+    if args.output.is_none() && !args.check_duplicates {
         print_banner();
     }
     
@@ -81,7 +87,7 @@ fn main() -> Result<()> {
         PathBuf::from("Cargo.toml")
     };
 
-    if args.output.is_none() {
+    if args.output.is_none() && !args.check_duplicates {
         println!(
             "{} Analyzing: {}",
             "🔍".bright_yellow(),
@@ -103,6 +109,23 @@ fn main() -> Result<()> {
         let manifest = CargoParser::parse(&cargo_path)?;
         DependencyGraph::from_manifest(&manifest)
     };
+    
+    // Handle duplicate check (NEW LOGIC)
+    if args.check_duplicates {
+        if !args.nested {
+            println!("{}", "⚠️  Warning: Duplicate detection works best with --nested flag".bright_yellow());
+            println!("   Run: dendron --nested --check-duplicates");
+            println!();
+        }
+
+        let duplicates = DuplicateAnalyzer::analyze(&graph);
+        DuplicateAnalyzer::print_report(&duplicates);
+        
+        let dup_stats = DuplicateAnalyzer::get_stats(&duplicates);
+        dup_stats.print();
+        
+        return Ok(());
+    }
     
     // Handle output format
     if let Some(format) = args.output {
