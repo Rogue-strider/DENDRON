@@ -44,9 +44,8 @@ struct Args {
     #[arg(short, long, value_name = "FORMAT")]
     output: Option<String>,
 
-    /// Check for duplicate dependency versions
     #[arg(long)]
-    check_duplicates: bool,  // <-- NEW
+    check_duplicates: bool,  
 }
 
 
@@ -72,7 +71,6 @@ fn main() -> Result<()> {
         colored::control::set_override(false);
     }
 
-    // If output format is specified, skip banner for clean output
     if args.output.is_none() && !args.check_duplicates {
         print_banner();
     }
@@ -110,7 +108,6 @@ fn main() -> Result<()> {
         DependencyGraph::from_manifest(&manifest)
     };
     
-    // Handle duplicate check (NEW LOGIC)
     if args.check_duplicates {
         if !args.nested {
             println!("{}", "⚠️  Warning: Duplicate detection works best with --nested flag".bright_yellow());
@@ -127,7 +124,6 @@ fn main() -> Result<()> {
         return Ok(());
     }
     
-    // Handle output format
     if let Some(format) = args.output {
         match format.to_lowercase().as_str() {
             "json" => {
@@ -151,7 +147,6 @@ fn main() -> Result<()> {
         return Ok(());
     }
     
-    // Normal output - Print tree based on options
     if args.summary {
         graph.print_summary();
     } else if args.direct_only {
