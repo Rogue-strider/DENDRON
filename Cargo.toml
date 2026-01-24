@@ -1,5 +1,5 @@
 [package]
-name = "dendron"
+name = "dendron-viz"
 version = "0.1.0"
 edition = "2021"
 authors = ["Rogue-strider <satyamjha91064@gmail.com>"]

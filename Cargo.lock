@@ -147,7 +147,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dendron"
+name = "dendron-viz"
 version = "0.1.0"
 dependencies = [
  "anyhow",
