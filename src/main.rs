@@ -216,7 +216,7 @@ mod tests {
         assert!(result.is_ok(), "Should parse Cargo.toml successfully");
 
         let manifest = result.unwrap();
-        assert_eq!(manifest.package.name, "dendron");
+        assert_eq!(manifest.package.name, "dendron-viz");
     }
 
     #[test]
@@ -224,7 +224,7 @@ mod tests {
         let manifest = CargoParser::parse("Cargo.toml").unwrap();
         let graph = DependencyGraph::from_manifest(&manifest);
 
-        assert_eq!(graph.root.name, "dendron");
+        assert_eq!(graph.root.name, "dendron-viz");
         assert!(graph.root.dependencies.len() > 0);
     }
 
