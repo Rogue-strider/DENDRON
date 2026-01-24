@@ -70,7 +70,7 @@ cargo install --path .
 
 ### From crates.io (Coming Soon)
 ```bash
-cargo install dendron
+cargo install dendron-viz
 ```
 
 ### Prerequisites
