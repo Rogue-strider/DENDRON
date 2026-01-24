@@ -3,19 +3,6 @@
 version = 4
 
 [[package]]
-name = "DENDRON"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "cargo_metadata",
- "clap",
- "colored",
- "serde",
- "serde_json",
- "toml",
-]
-
-[[package]]
 name = "anstream"
 version = "0.6.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -157,6 +144,19 @@ checksum = "117725a109d387c937a1533ce01b450cbde6b88abceea8473c4d7a85853cda3c"
 dependencies = [
  "lazy_static",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "dendron"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "cargo_metadata",
+ "clap",
+ "colored",
+ "serde",
+ "serde_json",
+ "toml",
 ]
 
 [[package]]

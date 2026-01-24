@@ -1,1 +1,37 @@
 /target
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test outputs
+*.profraw
+*.profdata
+
+# Documentation build
+/doc/
+
+# Local configs
+.env
+.env.local
+
+# HTML docs (keep in repo for GitHub pages)
+# DENDRON_README.html - keep this one
