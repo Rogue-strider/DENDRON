@@ -412,7 +412,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Inspired by tools like `cargo tree`, `npm ls`, and various dependency visualization tools
 - Built with amazing Rust crates from the community
-- Special thanks to all contributors
+- Special thanks to all contributors (ofCourse its only me🥲) but hoping for others to contribute
 
 ---
 
