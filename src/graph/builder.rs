@@ -1,8 +1,8 @@
-use crate::parser::{CargoManifest, CargoParser, MetadataParser, PackageInfo};
 use super::node::DependencyNode;
+use crate::parser::{CargoManifest, CargoParser, MetadataParser, PackageInfo};
+use colored::*;
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
-use colored::*;
 
 pub struct DependencyGraph {
     pub root: DependencyNode,
@@ -13,26 +13,23 @@ impl DependencyGraph {
     pub fn from_manifest(manifest: &CargoManifest) -> Self {
         let root_name = manifest.package.name.clone();
         let root_version = manifest.package.version.clone();
-        
+
         let mut root = DependencyNode::new(root_name.clone(), root_version);
         let mut nodes = HashMap::new();
 
         for (dep_name, dep) in &manifest.dependencies {
             root.add_dependency(dep_name.clone());
-            
-            let version = CargoParser::get_version(dep)
-                .unwrap_or_else(|| "unknown".to_string());
-            
-            let dep_node = DependencyNode::new(dep_name.clone(), version)
-                .with_depth(1);
-            
+
+            let version = CargoParser::get_version(dep).unwrap_or_else(|| "unknown".to_string());
+
+            let dep_node = DependencyNode::new(dep_name.clone(), version).with_depth(1);
+
             nodes.insert(dep_name.clone(), dep_node);
         }
 
         Self { root, nodes }
     }
 
-    
     pub fn from_metadata<P: AsRef<Path>>(manifest_path: P) -> anyhow::Result<Self> {
         let packages = MetadataParser::parse(&manifest_path)?;
         let root_name = MetadataParser::get_root_package_name(&manifest_path)?;
@@ -41,24 +38,14 @@ impl DependencyGraph {
             .get(&root_name)
             .ok_or_else(|| anyhow::anyhow!("Root package not found"))?;
 
-        let mut root = DependencyNode::new(
-            root_package.name.clone(),
-            root_package.version.clone(),
-        );
+        let mut root = DependencyNode::new(root_package.name.clone(), root_package.version.clone());
 
         let mut nodes = HashMap::new();
         let mut visited = HashSet::new();
 
-       
         for dep_name in &root_package.dependencies {
             root.add_dependency(dep_name.clone());
-            Self::build_tree_recursive(
-                dep_name,
-                1,
-                &packages,
-                &mut nodes,
-                &mut visited,
-            );
+            Self::build_tree_recursive(dep_name, 1, &packages, &mut nodes, &mut visited);
         }
 
         Ok(Self { root, nodes })
@@ -78,22 +65,13 @@ impl DependencyGraph {
         visited.insert(package_name.to_string());
 
         if let Some(package) = all_packages.get(package_name) {
-            let mut node = DependencyNode::new(
-                package.name.clone(),
-                package.version.clone(),
-            )
-            .with_depth(depth);
+            let mut node = DependencyNode::new(package.name.clone(), package.version.clone())
+                .with_depth(depth);
 
             for dep_name in &package.dependencies {
                 node.add_dependency(dep_name.clone());
-                
-                Self::build_tree_recursive(
-                    dep_name,
-                    depth + 1,
-                    all_packages,
-                    nodes,
-                    visited,
-                );
+
+                Self::build_tree_recursive(dep_name, depth + 1, all_packages, nodes, visited);
             }
 
             nodes.insert(package_name.to_string(), node);
@@ -124,7 +102,7 @@ impl DependencyGraph {
                 3 => node.name.bright_cyan(),
                 _ => node.name.white(),
             };
-            
+
             println!(
                 "{}{}{} {}",
                 prefix.bright_black(),
@@ -139,11 +117,15 @@ impl DependencyGraph {
 
         for (i, dep_name) in node.dependencies.iter().enumerate() {
             let is_last_child = i == dep_count - 1;
-            
+
             if let Some(child_node) = self.nodes.get(dep_name) {
                 self.print_node(child_node, &child_prefix, is_last_child);
             } else {
-                let child_connector = if is_last_child { "└── " } else { "├── " };
+                let child_connector = if is_last_child {
+                    "└── "
+                } else {
+                    "├── "
+                };
                 println!(
                     "{}{}{} {}",
                     child_prefix.bright_black(),
@@ -156,9 +138,12 @@ impl DependencyGraph {
     }
 
     pub fn print_tree_direct_only(&self) {
-        println!("{}", "🌳 Dependency Tree (Direct Only):".bright_cyan().bold());
+        println!(
+            "{}",
+            "🌳 Dependency Tree (Direct Only):".bright_cyan().bold()
+        );
         println!();
-        
+
         println!(
             "{} {} {}",
             "📦".bright_yellow(),
@@ -170,7 +155,7 @@ impl DependencyGraph {
         for (i, dep_name) in self.root.dependencies.iter().enumerate() {
             let is_last = i == dep_count - 1;
             let connector = if is_last { "└── " } else { "├── " };
-            
+
             if let Some(node) = self.nodes.get(dep_name) {
                 println!(
                     "{}{} {}",
@@ -185,13 +170,21 @@ impl DependencyGraph {
     pub fn print_tree_with_depth(&self, max_depth: usize) {
         println!(
             "{}",
-            format!("🌳 Dependency Tree (Max Depth: {})", max_depth).bright_cyan().bold()
+            format!("🌳 Dependency Tree (Max Depth: {})", max_depth)
+                .bright_cyan()
+                .bold()
         );
         println!();
         self.print_node_with_depth(&self.root, "", true, max_depth);
     }
 
-    fn print_node_with_depth(&self, node: &DependencyNode, prefix: &str, is_last: bool, max_depth: usize) {
+    fn print_node_with_depth(
+        &self,
+        node: &DependencyNode,
+        prefix: &str,
+        is_last: bool,
+        max_depth: usize,
+    ) {
         let connector = if is_last { "└── " } else { "├── " };
         let extension = if is_last { "    " } else { "│   " };
 
@@ -209,7 +202,7 @@ impl DependencyGraph {
                 3 => node.name.bright_cyan(),
                 _ => node.name.white(),
             };
-            
+
             println!(
                 "{}{}{} {}",
                 prefix.bright_black(),
@@ -228,11 +221,15 @@ impl DependencyGraph {
 
         for (i, dep_name) in node.dependencies.iter().enumerate() {
             let is_last_child = i == dep_count - 1;
-            
+
             if let Some(child_node) = self.nodes.get(dep_name) {
                 self.print_node_with_depth(child_node, &child_prefix, is_last_child, max_depth);
             } else {
-                let child_connector = if is_last_child { "└── " } else { "├── " };
+                let child_connector = if is_last_child {
+                    "└── "
+                } else {
+                    "├── "
+                };
                 println!(
                     "{}{}{} {}",
                     child_prefix.bright_black(),
@@ -247,7 +244,7 @@ impl DependencyGraph {
     pub fn print_summary(&self) {
         println!("{}", "📋 Dependency Summary:".bright_cyan().bold());
         println!();
-        
+
         println!(
             "{} {} {}",
             "📦".bright_yellow(),
@@ -255,24 +252,33 @@ impl DependencyGraph {
             format!("({})", self.root.version).bright_black()
         );
         println!();
-        
+
         let mut by_depth: HashMap<usize, Vec<&DependencyNode>> = HashMap::new();
-        
+
         for node in self.nodes.values() {
-            by_depth.entry(node.depth).or_insert_with(Vec::new).push(node);
+            by_depth
+                .entry(node.depth)
+                .or_insert_with(Vec::new)
+                .push(node);
         }
-        
+
         for depth in 1..=3 {
             if let Some(nodes) = by_depth.get(&depth) {
                 println!(
                     "{} {} {}",
                     "└─".bright_black(),
-                    format!("Level {}: {} packages", depth, nodes.len()).bright_blue().bold(),
+                    format!("Level {}: {} packages", depth, nodes.len())
+                        .bright_blue()
+                        .bold(),
                     format!("(showing first 10)").bright_black()
                 );
-                
+
                 for (i, node) in nodes.iter().take(10).enumerate() {
-                    let connector = if i == 9 || i == nodes.len() - 1 { "   └─" } else { "   ├─" };
+                    let connector = if i == 9 || i == nodes.len() - 1 {
+                        "   └─"
+                    } else {
+                        "   ├─"
+                    };
                     println!(
                         "   {} {} {}",
                         connector.bright_black(),
@@ -280,9 +286,13 @@ impl DependencyGraph {
                         format!("({})", node.version).bright_black()
                     );
                 }
-                
+
                 if nodes.len() > 10 {
-                    println!("   {} {} more packages...", "   └─".bright_black(), (nodes.len() - 10).to_string().bright_yellow());
+                    println!(
+                        "   {} {} more packages...",
+                        "   └─".bright_black(),
+                        (nodes.len() - 10).to_string().bright_yellow()
+                    );
                 }
                 println!();
             }
@@ -299,7 +309,8 @@ impl DependencyGraph {
     }
 
     fn calculate_max_depth(&self) -> usize {
-        self.nodes.values()
+        self.nodes
+            .values()
             .map(|node| node.depth)
             .max()
             .unwrap_or(0)

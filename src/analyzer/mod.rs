@@ -1,4 +1,4 @@
+pub mod circular;
 pub mod duplicates;
-pub mod circular; 
-pub use duplicates::DuplicateAnalyzer;
 pub use circular::CircularAnalyzer;
+pub use duplicates::DuplicateAnalyzer;

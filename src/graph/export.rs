@@ -1,7 +1,7 @@
 use super::{DependencyGraph, GraphStats};
-use serde::{Serialize, Deserialize};
-use std::collections::HashMap;
 use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct JsonOutput {

@@ -1,6 +1,6 @@
 use crate::graph::DependencyGraph;
-use std::collections::{HashMap, HashSet};
 use colored::*;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone)]
 pub struct CircularDependency {
@@ -17,7 +17,7 @@ impl CircularAnalyzer {
 
         // Build adjacency list
         let mut adj_list: HashMap<String, Vec<String>> = HashMap::new();
-        
+
         // Add root dependencies
         for dep in &graph.root.dependencies {
             adj_list
@@ -36,13 +36,7 @@ impl CircularAnalyzer {
         // DFS to find cycles
         for node in adj_list.keys() {
             if !visited.contains(node) {
-                Self::dfs_find_cycles(
-                    node,
-                    &adj_list,
-                    &mut visited,
-                    &mut rec_stack,
-                    &mut cycles,
-                );
+                Self::dfs_find_cycles(node, &adj_list, &mut visited, &mut rec_stack, &mut cycles);
             }
         }
 
@@ -68,11 +62,8 @@ impl CircularAnalyzer {
                     Self::dfs_find_cycles(neighbor, adj_list, visited, rec_stack, cycles);
                 } else if rec_stack.contains(neighbor) {
                     // Found a cycle
-                    let cycle_start = rec_stack
-                        .iter()
-                        .position(|n| n == neighbor)
-                        .unwrap();
-                    
+                    let cycle_start = rec_stack.iter().position(|n| n == neighbor).unwrap();
+
                     let mut cycle: Vec<String> = rec_stack[cycle_start..].to_vec();
                     cycle.push(neighbor.to_string()); // Complete the cycle
 
@@ -107,7 +98,8 @@ impl CircularAnalyzer {
         println!(
             "{} {}",
             "⚠️".bright_red().bold(),
-            format!("Found {} circular dependenc{}:", 
+            format!(
+                "Found {} circular dependenc{}:",
                 cycles.len(),
                 if cycles.len() == 1 { "y" } else { "ies" }
             )
@@ -125,7 +117,7 @@ impl CircularAnalyzer {
 
             for (j, package) in cycle.cycle.iter().enumerate() {
                 let is_last = j == cycle.cycle.len() - 1;
-                
+
                 if is_last {
                     // Last item shows the cycle completion
                     println!(
@@ -194,7 +186,10 @@ pub struct CircularStats {
 impl CircularStats {
     pub fn print(&self) {
         println!();
-        println!("{}", "📊 Circular Dependency Statistics:".bright_cyan().bold());
+        println!(
+            "{}",
+            "📊 Circular Dependency Statistics:".bright_cyan().bold()
+        );
         println!(
             "  {} Total cycles: {}",
             "├─".bright_black(),
@@ -203,7 +198,10 @@ impl CircularStats {
         println!(
             "  {} Packages involved: {}",
             "├─".bright_black(),
-            self.total_packages_in_cycles.to_string().bright_yellow().bold()
+            self.total_packages_in_cycles
+                .to_string()
+                .bright_yellow()
+                .bold()
         );
         println!(
             "  {} Longest cycle: {} packages",

@@ -36,15 +36,14 @@ pub struct CargoParser;
 
 impl CargoParser {
     pub fn parse<P: AsRef<Path>>(path: P) -> Result<CargoManifest> {
-        let content = fs::read_to_string(path)
-            .context("Failed to read Cargo.toml file")?;
-        
-        let manifest: CargoManifest = toml::from_str(&content)
-            .context("Failed to parse Cargo.toml")?;
-        
+        let content = fs::read_to_string(path).context("Failed to read Cargo.toml file")?;
+
+        let manifest: CargoManifest =
+            toml::from_str(&content).context("Failed to parse Cargo.toml")?;
+
         Ok(manifest)
     }
-    
+
     pub fn get_version(dep: &Dependency) -> Option<String> {
         match dep {
             Dependency::Simple(v) => Some(v.clone()),

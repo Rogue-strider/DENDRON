@@ -1,6 +1,6 @@
 use crate::graph::DependencyGraph;
-use std::collections::HashMap;
 use colored::*;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct DuplicatePackage {
@@ -72,7 +72,10 @@ impl DuplicateAnalyzer {
 
     pub fn print_report(duplicates: &[DuplicatePackage]) {
         if duplicates.is_empty() {
-            println!("{}", "✅ No duplicate versions found!".bright_green().bold());
+            println!(
+                "{}",
+                "✅ No duplicate versions found!".bright_green().bold()
+            );
             println!("   All dependencies use consistent versions.");
             return;
         }
@@ -80,9 +83,12 @@ impl DuplicateAnalyzer {
         println!(
             "{} {}",
             "⚠️".bright_yellow(),
-            format!("Found {} packages with multiple versions:", duplicates.len())
-                .bright_yellow()
-                .bold()
+            format!(
+                "Found {} packages with multiple versions:",
+                duplicates.len()
+            )
+            .bright_yellow()
+            .bold()
         );
         println!();
 
@@ -108,10 +114,16 @@ impl DuplicateAnalyzer {
                     connector.bright_black(),
                     "v".bright_black(),
                     version_color.bold(),
-                    format!("(used {} time{})", 
+                    format!(
+                        "(used {} time{})",
                         version_info.used_by_count,
-                        if version_info.used_by_count > 1 { "s" } else { "" }
-                    ).bright_black()
+                        if version_info.used_by_count > 1 {
+                            "s"
+                        } else {
+                            ""
+                        }
+                    )
+                    .bright_black()
                 );
             }
             println!();

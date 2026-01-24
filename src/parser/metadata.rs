@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use cargo_metadata::{MetadataCommand, Package, DependencyKind};
+use cargo_metadata::{DependencyKind, MetadataCommand, Package};
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
@@ -51,9 +51,7 @@ impl MetadataParser {
             .exec()
             .context("Failed to execute cargo metadata")?;
 
-        let root_package = metadata
-            .root_package()
-            .context("No root package found")?;
+        let root_package = metadata.root_package().context("No root package found")?;
 
         Ok(root_package.name.clone())
     }
