@@ -254,8 +254,8 @@ Cycle 2:
 ```json
 {
   "package": {
-    "name": "dendron",
-    "version": "0.1.0"
+    "name": "dendron-viz",
+    "version": "0.1.1"
   },
   "dependencies": {
     "toml": {
