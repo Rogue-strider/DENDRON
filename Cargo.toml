@@ -1,6 +1,6 @@
 [package]
 name = "dendron-viz"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Rogue-strider <satyamjha91064@gmail.com>"]
 description = "A powerful dependency graph visualizer and analyzer for Rust projects"
